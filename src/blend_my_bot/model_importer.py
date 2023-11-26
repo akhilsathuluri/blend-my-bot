@@ -83,6 +83,13 @@ class ModelImporter:
             np.zeros(kindyn.getNrOfDegreesOfFreedom()),
             np.zeros(3),
         )
+
+        # create a collection to load the robot model into
+        if model_name not in bpy.data.collections:
+            model_collection = bpy.data.collections.new(model_name)
+        else:
+            model_collection = bpy.data.collections[model_name]
+
         for link_id in range(model_geometry.getNrOfLinks()):
             link_name = model_geometry.getLinkName(link_id)
             link_visual = visuals[link_id][0]
@@ -107,6 +114,8 @@ class ModelImporter:
                     raise ValueError(
                         f"Extension {mesh_path.split('.')[-1]} not supported"
                     )
+                # add the mesh to the collection
+                model_collection.objects.link(mesh)
                 mesh.name = mesh_name
                 mesh.scale = link_visual.asExternalMesh().getScale().toNumPy().flatten()
                 mesh.rotation_mode = "QUATERNION"
@@ -117,4 +126,6 @@ class ModelImporter:
                 mesh.location = w_H_g.getPosition()
                 mesh.rotation_quaternion = w_H_g.getRotation().asQuaternion()
                 links[link_name] = Link(link_name, mesh, l_H_g)
+        
+        bpy.context.scene.collection.children.link(model_collection)
         return links

@@ -1,3 +1,9 @@
+# -----------------------
+# FROM DEV ONLY
+import sys
+sys.path.append('/home/laniakea/git/blend-my-bot/src/')
+# -----------------------
+
 from blend_my_bot import ModelImporter
 import bpy
 import numpy as np
@@ -11,6 +17,9 @@ from scipy.spatial.transform import Rotation
 # if resolve_robotics_uri_py is not installed on your system, you can install it with:
 # pip install resolve-robotics-uri-py
 # or mamba install -c conda-forge resolve-robotics-uri-py
+
+# reset the blender scene
+# bpy.ops.wm.read_factory_settings(use_empty=True)
 
 # if when you run the script you are not able to resolve the path to the robot,
 # activate the conda environment from a terminal outside vscode
@@ -93,3 +102,21 @@ for k in range(data["knots"]):
     model.update(w_H_b, s)
     # set the current frame
     bpy.context.scene.frame_set(k)
+
+# Set camera position
+# TODO: ideally should have a way to load the camera keypoints too as a 
+# separate class
+camera_transform = {"position": np.array([-3.5, 0, 0.55]), 
+                    "orientation": np.array([0.5,0.5,-0.5,-0.5])}
+
+bpy.context.scene.camera.location = camera_transform["position"]
+
+# Set camera orientation
+bpy.context.scene.camera.rotation_mode = "QUATERNION"
+bpy.context.scene.camera.rotation_quaternion = camera_transform["orientation"]
+
+# TODO: also need a helper class to add basic stuff like cubes and planes
+# TODO: Also helper functions to clear the scene and reset it for troubleshooting mode while running the script multiple times 
+# TODO: A class to automatically add textures!
+# TODO: A class to render and save the video
+
